@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/iOS_ImasD/!svn/ver/12/libraries/AsyncImage/AsyncImage/Classes/Libraries/AsynImages
+END
+AsyncImageView.h
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/iOS_ImasD/!svn/ver/13/libraries/AsyncImage/AsyncImage/Classes/Libraries/AsynImages/AsyncImageView.h
+END
+ImageManager.h
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/iOS_ImasD/!svn/ver/13/libraries/AsyncImage/AsyncImage/Classes/Libraries/AsynImages/ImageManager.h
+END
+AsyncImageView.m
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/iOS_ImasD/!svn/ver/12/libraries/AsyncImage/AsyncImage/Classes/Libraries/AsynImages/AsyncImageView.m
+END
+ImageDownloader.h
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/iOS_ImasD/!svn/ver/13/libraries/AsyncImage/AsyncImage/Classes/Libraries/AsynImages/ImageDownloader.h
+END
+ImageManager.m
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/iOS_ImasD/!svn/ver/13/libraries/AsyncImage/AsyncImage/Classes/Libraries/AsynImages/ImageManager.m
+END
+ImageDownloader.m
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/iOS_ImasD/!svn/ver/12/libraries/AsyncImage/AsyncImage/Classes/Libraries/AsynImages/ImageDownloader.m
+END
