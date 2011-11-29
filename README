@@ -1,3 +1,9 @@
-This project is provided AS-IF, just download it, and run it.
+- This project is provided AS-IF, just download it, and run it to see how it works
 
-All you need to know is in AsyncImageView.h and ImageManager.h
+- All you need to know is in AsyncImageView.h and ImageManager.h
+
+- Basically what it does is provide a mechanism to download and store images in a local cache in an efficient way (if suddenly you need to show at the sime time the same image 4 times, it won't download the image 4 times, just once and tell all the images to update themselves).
+
+- Also it has an implementation for "imageNamed" as a workarround for the cache problem of the native "imageNamed" on some old OS versions.
+
+- Since Nov 29/2001 the cache stores the images in the cache folder in case of iOS 5.0 and in case of 5.0.1 or greater in the documents folder BUT with the 'com.apple.MobileBackup' flag to avoid backups of the image cache files.
