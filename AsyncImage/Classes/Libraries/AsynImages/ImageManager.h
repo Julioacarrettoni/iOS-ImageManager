@@ -7,11 +7,9 @@
 //  and from whiting, call requestImageFromUrl:forObj:forceReDownload:
 //
 
-
 #pragma mark - CONFIGURATION
 //
 #define LAZY_REQUEST NO
-
 
 #import <Foundation/Foundation.h>
 #import "ImageDownloader.h"
@@ -55,8 +53,9 @@
 	
 	//For managing files on the disk:
 	NSFileManager *fileManager;
-	NSArray *paths;
+	
 	NSString *documentsDirectory;
+    NSString *cacheDirectory;
 }
 #pragma mark static methods
 + (ImageManager*) sharedInstance;

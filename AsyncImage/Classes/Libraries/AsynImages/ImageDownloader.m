@@ -61,7 +61,7 @@
     }
     
 	downloadedData = [NSMutableData new];
-	theConnection = [[NSURLConnection new] initWithRequest:[NSURLRequest requestWithURL:imageURL] delegate:self startImmediately:YES];
+	theConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:imageURL] delegate:self startImmediately:YES];
 }
 
 + (ImageDownloader*) requestImageFromURL:(NSURL*) imageURL

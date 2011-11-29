@@ -1,6 +1,6 @@
 //
 //  ImageManager.m
-//  MobileShopping
+//  FDV Solutions
 //
 //  Created by Julio Carrettoni on 26/05/10.
 //  Copyright 2010 FDV Solutions. All rights reserved.
@@ -9,6 +9,10 @@
 #import "ImageManager.h"
 #import "ImageDownloader.h"
 #import "asyncimageview.h"
+
+#include <sys/xattr.h>
+#define IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+#define DIRECTORY_FOR_STORING_DATA_DUE_TO_ICLOUD ((IOS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0.1"))? documentsDirectory : cacheDirectory)
 
 #pragma mark - Constants
 static NSString* imageCacheFolder = @"/imageCache/";
@@ -33,6 +37,18 @@ static NSString* imageCacheFolder = @"/imageCache/";
 static ImageManager* instance = nil;
 
 @implementation ImageManager
+
+#pragma mark - FOr iOS 5.0.1 and beyong!
++ (BOOL)addSkipBackupAttributeToItemAtPath:(NSString *)path;
+{
+    const char* filePath = [path fileSystemRepresentation];
+    
+    const char* attrName = "com.apple.MobileBackup";
+    u_int8_t attrValue = 1;
+    
+    int result = setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+    return result == 0;
+}
 
 #pragma mark - static methods
 + (ImageManager*) sharedInstance
@@ -73,13 +89,24 @@ static ImageManager* instance = nil;
 		
 		//We create what we need to acces the files on the disk ONCE to improve access later
 		fileManager = [[NSFileManager defaultManager] retain];
-		paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 		documentsDirectory = [[[paths objectAtIndex:0] stringByAppendingString:imageCacheFolder] retain];
-		
+        
+        paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+		cacheDirectory =  [[[paths objectAtIndex:0] stringByAppendingString:imageCacheFolder] retain];
+        
 		//In case the folder doesn't exist, we create it now and we only make the check once
 		if (![fileManager fileExistsAtPath:documentsDirectory])
 		{
 			[fileManager createDirectoryAtPath:documentsDirectory withIntermediateDirectories:YES attributes:nil error:nil];
+            [ImageManager addSkipBackupAttributeToItemAtPath:documentsDirectory];
+		}
+        
+        //In case the folder doesn't exist, we create it now and we only make the check once
+		if (![fileManager fileExistsAtPath:cacheDirectory])
+		{
+			[fileManager createDirectoryAtPath:cacheDirectory withIntermediateDirectories:YES attributes:nil error:nil];
+            [ImageManager addSkipBackupAttributeToItemAtPath:cacheDirectory];
 		}
 		
         //we create the necesary structures to manage the downladers
@@ -198,7 +225,7 @@ static ImageManager* instance = nil;
     }
     else
     {
-        [delegates performSelector:@selector(imageFailedToDownloadFromURL:) withObject:imageDownloader.url.absoluteString];
+        [delegates makeObjectsPerformSelector:@selector(imageFailedToDownloadFromURL:) withObject:imageDownloader.url.absoluteString];
     }
     
     [imageDownloaders removeObjectForKey:imageDownloader.url.absoluteString];
@@ -218,7 +245,13 @@ static ImageManager* instance = nil;
 - (void) eraseHardCache
 {
 	[fileManager removeItemAtPath:documentsDirectory error:nil];
+    [fileManager removeItemAtPath:cacheDirectory error:nil];
+    
 	[fileManager createDirectoryAtPath:documentsDirectory withIntermediateDirectories:YES attributes:nil error:nil];
+    [fileManager createDirectoryAtPath:cacheDirectory withIntermediateDirectories:YES attributes:nil error:nil];
+    
+    [ImageManager addSkipBackupAttributeToItemAtPath:documentsDirectory];
+    [ImageManager addSkipBackupAttributeToItemAtPath:cacheDirectory];
 }
 
 //In case we are low on memory we erase the RAM cache.
@@ -243,8 +276,8 @@ static ImageManager* instance = nil;
     if (image)
         return image;
     
-	NSString *path = [documentsDirectory stringByAppendingPathComponent:[self getImageFileNameFrom:imageURL]];
-	
+    
+	NSString *path = [DIRECTORY_FOR_STORING_DATA_DUE_TO_ICLOUD stringByAppendingPathComponent:[self getImageFileNameFrom:imageURL]];
     if (![fileManager fileExistsAtPath:path])
         return nil;
 	
@@ -267,8 +300,9 @@ static ImageManager* instance = nil;
 	if (data != nil && imageURL != nil)
 	{
 		//Now we save it to the fyle system
-		NSString* filePath = [documentsDirectory stringByAppendingString:[self getImageFileNameFrom:imageURL]];
+		NSString* filePath = [DIRECTORY_FOR_STORING_DATA_DUE_TO_ICLOUD stringByAppendingString:[self getImageFileNameFrom:imageURL]];
 		[fileManager createFileAtPath:filePath contents:data attributes:nil];
+        [ImageManager addSkipBackupAttributeToItemAtPath:filePath];
 	}
 }
 
