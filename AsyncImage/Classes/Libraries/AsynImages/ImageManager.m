@@ -70,6 +70,13 @@ static ImageManager* instance = nil;
 	[instance eraseHardCache];
 }
 
+- (void) applicationDidEnterBackground:(id) obj
+{
+	@synchronized(self) {
+		[self freeRamCache];
+	}    
+}
+
 - (void) receivedMemoryNotification:(id) obj
 {
 	@synchronized(self) {
@@ -114,6 +121,7 @@ static ImageManager* instance = nil;
         
 		//We want to be noticed in cases of low memory to free the RAM cache
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receivedMemoryNotification:) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
 	}
     return self;
 }
