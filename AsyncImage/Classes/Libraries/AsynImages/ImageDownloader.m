@@ -30,6 +30,9 @@
 
 - (void) dealloc
 {
+    [downloadedData release];
+    downloadedData = nil;
+    
 	[theConnection release];
 	theConnection = nil;
 	
@@ -68,7 +71,6 @@
 {
 	ImageDownloader* imageDownloader = [ImageDownloader new];
     imageDownloader.url = imageURL;
-	//[imageDownloader requestImageFromURL:imageURL];
     [imageDownloader performSelector:@selector(requestImageFromURL:) withObject:imageURL afterDelay:0.1];
 	return [imageDownloader autorelease];
 }
