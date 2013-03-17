@@ -8,8 +8,9 @@
 //
 
 #pragma mark - CONFIGURATION
-//
 #define LAZY_REQUEST NO
+#define DEFAULT_TIMEOUT 15.
+
 
 #import <Foundation/Foundation.h>
 #import "ImageDownloader.h"
@@ -30,16 +31,7 @@
 - (void) imageFailedToDownloadFromURL:(NSString*)imageURL;
 
 @optional
-/* NOT FOR THE TIME BEING
- 
-//The following methods are just in case you need to implement special behaviour in your program
-- (void) imageNotOnRAM:(NSString*) imageURL;
-- (void) imageNotOnDisk:(NSString*) imageURL;
 
-- (BOOL) shouldDownloadImageFromURL:(NSString*)imageURL;
-- (BOOL) shouldCacheIntoRAMImageFromURL:(NSString*) imageURL;
-- (BOOL) shouldCacheIntoDiskImageFromURL:(NSString*) imageURL;
-*/
 @end
 
 #pragma mark - ImageManager class -
@@ -50,6 +42,7 @@
 	
 	//For the RAM cache
 	NSMutableDictionary* imagesOnRAM;
+    NSMutableArray* imagesAccessedHistory;
 	
 	//For managing files on the disk:
 	NSFileManager *fileManager;
@@ -60,6 +53,7 @@
 #pragma mark static methods
 + (ImageManager*) sharedInstance;
 + (void) freeRamCache;
+- (void) freeHalfRamCache;
 + (void) eraseHardCache;
 - (UIImage*) getImageFromFile:(NSURL*) imageURL;
 
@@ -68,5 +62,7 @@
 
 #pragma mark request Image from URL
 - (void) requestImageFromUrl:(NSString*)url forObj:(id <ImageManagerDelegate>)delegate forceReDownload:(BOOL)force;
+
+- (void)removeDelegate:(id<ImageDownloaderDelegate>)delegate;
 
 @end

@@ -24,10 +24,14 @@
 	NSMutableData* downloadedData;
 }
 
-@property (nonatomic, retain) NSURL* url;
+@property (nonatomic, retain) NSURL *url;
 
-+ (ImageDownloader*) requestImageFromURL:(NSURL*) imageURL;
++ (ImageDownloader *)requestImageFromURL:(NSURL *)imageURL;
++ (ImageDownloader *)requestImageFromURL:(NSURL *)imageURL force:(BOOL)force;
+- (void)requestImageFromURL:(NSURL *)imageURL force:(BOOL)force;
+
 - (void) cancel;
 
 @property (nonatomic, retain) NSMutableArray* delegates;
+
 @end

@@ -8,6 +8,10 @@
 #import "ImageDownloader.h"
 #import "ImageManager.h"
 
+@interface ImageDownloader () <NSURLConnectionDataDelegate>
+
+@end
+
 @implementation ImageDownloader
 @synthesize url;
 @synthesize delegates;
@@ -53,25 +57,39 @@
 }
 
 #pragma mark - Request image from URL
-- (void) requestImageFromURL:(NSURL*) imageURL
-{
-    UIImage* image = [[ImageManager sharedInstance] getImageFromFile:imageURL];
+
+- (void)requestImageFromURL:(NSURL *)imageURL {
+    [self requestImageFromURL:imageURL force:NO];
+}
+
+- (void)forceRequestImageFromURL:(NSURL *)imageURL {
+    [self requestImageFromURL:imageURL force:YES];
+}
+
+- (void)requestImageFromURL:(NSURL *)imageURL force:(BOOL)force {
+    UIImage* image = force? nil: [[ImageManager sharedInstance] getImageFromFile:imageURL];
     
-    if (image)
-    {
+    if (image) {
         [[ImageManager sharedInstance] imageDownloader:self foundCacheImage:image];
         return;
     }
     
 	downloadedData = [NSMutableData new];
-	theConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:imageURL] delegate:self startImmediately:YES];
+    NSURLRequest *request = [NSURLRequest requestWithURL:imageURL
+                                             cachePolicy:NSURLRequestReloadRevalidatingCacheData
+                                         timeoutInterval:DEFAULT_TIMEOUT];
+	theConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
 }
 
-+ (ImageDownloader*) requestImageFromURL:(NSURL*) imageURL
-{
++ (ImageDownloader *)requestImageFromURL:(NSURL *)imageURL {
+    return [self requestImageFromURL:imageURL force:NO];
+}
+
++ (ImageDownloader *)requestImageFromURL:(NSURL *)imageURL force:(BOOL)force {
 	ImageDownloader* imageDownloader = [ImageDownloader new];
     imageDownloader.url = imageURL;
-    [imageDownloader performSelector:@selector(requestImageFromURL:) withObject:imageURL afterDelay:0.1];
+    SEL selector = force? @selector(forceRequestImageFromURL:): @selector(requestImageFromURL:);
+    [imageDownloader performSelector:selector withObject:imageURL afterDelay:0.1];
 	return [imageDownloader autorelease];
 }
 
@@ -81,6 +99,16 @@
 }
 
 #pragma mark - NSURLConnectionDelegate
+
+-(NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)response {
+    if (response) {
+        return [NSURLRequest requestWithURL:[request URL]
+                                cachePolicy:NSURLRequestReloadRevalidatingCacheData
+                            timeoutInterval:DEFAULT_TIMEOUT];
+    }
+    return request;
+}
+
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
 	[downloadedData appendData:data];
@@ -95,4 +123,6 @@
 {
 	[[ImageManager sharedInstance] imageDownloaderFailedToDownloadImage:self];
 }
+
+
 @end

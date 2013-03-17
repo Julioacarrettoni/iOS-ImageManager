@@ -16,7 +16,7 @@
 {
 	[imageURL release];
 	imageURL = nil;
-	
+    self.imageDownloader = nil;
 	self.loadingView = nil;
     self.asyncImageDownloadDelegate= nil;
     [super dealloc];
@@ -35,6 +35,10 @@
 	imageURL = [url retain];
 	
 	self.loadingView.hidden = NO;
+    
+    if ([self.loadingView respondsToSelector:@selector(startAnimating)])
+        [self.loadingView performSelector:@selector(startAnimating)];
+    
 	[[ImageManager sharedInstance] requestImageFromUrl:url forObj:self forceReDownload:force];
 }
 
@@ -49,6 +53,7 @@
     {
 		[self.asyncImageDownloadDelegate asyncImageFinishedToDownloadImage:self];
     }
+    self.imageDownloader = nil;
 }
 
 //When there is an error trying to download an image you get noticed in this method
